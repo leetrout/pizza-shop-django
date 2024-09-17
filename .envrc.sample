@@ -1,0 +1,6 @@
+if [ -d "venv" ]; then
+    export VIRTUAL_ENV=${PWD}/venv
+    layout python
+else
+    echo "No venv directory found. Please run scripts/boostrap.sh"
+fi

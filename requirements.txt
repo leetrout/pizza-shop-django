@@ -1,0 +1,12 @@
+Django==5.1.1
+djangorestframework
+psycopg2-binary
+rq
+redis
+django-environ
+python-ulid
+django-extensions
+Werkzeug
+sentry-sdk
+django-cors-headers
+django_rq

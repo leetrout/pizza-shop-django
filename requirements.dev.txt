@@ -1,0 +1,4 @@
+-r requirements.txt
+ipython
+black==22.10
+faker

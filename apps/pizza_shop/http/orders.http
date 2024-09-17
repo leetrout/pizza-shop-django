@@ -1,0 +1,60 @@
+@host=http://localhost:8000
+@basePath=/api
+
+@url={{host}}{{basePath}}
+
+### Get a customer by email
+GET {{url}}/customers/?email=leetrout4@gmail.com HTTP/1.1
+
+### Create a new order
+POST {{url}}/orders/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "pizzas": [{
+        "crust": "cru-01J7RXG77XT40BN6C6RY8KMKY0",
+        "toppings": [
+            "top-01J7RXG77P878N9VASPKXY985Z"
+        ],
+        "size": "sz-01J7RXG77H9JKZQZTDTG7YK04A",
+        "price": "0"
+    }],
+    "customer": {
+        "name": "lee",
+        "email": "leetrout4@gmail.com",
+        "phone": "12345"
+    },
+    "total_price": "4.80"
+}
+
+### Get crusts
+GET {{url}}/crusts/ HTTP/1.1
+
+### Get sizes
+GET {{url}}/sizes/ HTTP/1.1
+
+### Get toppings
+GET {{url}}/toppings/ HTTP/1.1
+
+### Create a new order with a known customer
+POST {{url}}/orders/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "pizzas": [{
+        "crust": "cru-01J7RXG77XT40BN6C6RY8KMKY0",
+        "toppings": [
+            "top-01J7RXG77P878N9VASPKXY985Z"
+        ],
+        "size": "sz-01J7RXG77H9JKZQZTDTG7YK04A",
+        "price": "0"
+    }],
+    "customer_external_id": "cust-01J7RYVNX7WAXQGBKRP1MG73MC",
+    "total_price": "4.80"
+}
+
+### Get a list of orders
+GET {{url}}/orders/ HTTP/1.1
+
+### Get a single order
+GET {{url}}/orders/:id/ HTTP/1.1
