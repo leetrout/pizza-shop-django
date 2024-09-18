@@ -1,2 +1,6 @@
-node_modules
+fly.toml
+.git/
+*.sqlite3
+venv
+**/node_modules
 __pycache__
