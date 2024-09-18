@@ -8,22 +8,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import os
-from pathlib import Path
 
-import environ
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-env = environ.FileAwareEnv()
-env.prefix = "PZA_"
-
-env_file_path = str(BASE_DIR / ".env")
-
-# OS environment variables take precedence over variables from .env
-if os.path.exists(env_file_path):
-    env.read_env(env_file_path)
+from ._env import BASE_DIR, env
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -202,7 +188,6 @@ LOGGING = {
         },
     },
 }
-
 
 if env.bool("SENTRY_ENABLED", False):
     from .sentry import *
