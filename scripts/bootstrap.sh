@@ -11,8 +11,10 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 cd "${SCRIPT_DIR}"/..
 
 echo "Install asdf plugins"
+set +e
 PLUGINS=$(cut -d' ' -f1 .tool-versions)
 for x in $PLUGINS; do asdf plugin add "$x"; done
+set -e
 
 echo "Installing asdf packages"
 asdf install
