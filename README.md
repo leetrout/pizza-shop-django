@@ -35,6 +35,7 @@ or prescriptive of which tools should be used.
 
 ### Philosophy
 
+- [A Philosophy of Software Design][philo] by John Ousterhout
 - [Ironies of Automation][auto-irony] by Lisanne Bainbridge
 - [Peopleware][peopleware]
 - [Volatility-Based Decomposition][volatility]
@@ -50,4 +51,5 @@ or prescriptive of which tools should be used.
 [docker-django]: https://github.com/nickjj/docker-django-example
 [nick]: https://nickjanetakis.com/
 [peopleware]: https://en.wikipedia.org/wiki/Peopleware:_Productive_Projects_and_Teams
+[philo]: https://web.stanford.edu/~ouster/cgi-bin/aposd.php
 [volatility]: https://www.informit.com/articles/article.aspx?p=2995357&seqNum=2
