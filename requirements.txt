@@ -9,3 +9,4 @@ django-extensions
 Werkzeug
 sentry-sdk
 django-cors-headers
+django_rq

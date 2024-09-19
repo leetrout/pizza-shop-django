@@ -189,5 +189,13 @@ LOGGING = {
     },
 }
 
+RQ_QUEUES = {
+    "default": {
+        "HOST": "localhost",
+        "PORT": 16379,
+        "DB": 0,
+    },
+}
+
 if env.bool("SENTRY_ENABLED", False):
     from .sentry import *
