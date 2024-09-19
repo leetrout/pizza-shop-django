@@ -64,7 +64,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-        process_pending_order.delay(serializer.instance.id)
+        # TODO: Background job with RQ
+        # process_pending_order.delay(serializer.instance.id)
 
 
 # class OrderCreateViewSet(viewsets.ModelViewSet):
