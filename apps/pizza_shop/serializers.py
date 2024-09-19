@@ -1,6 +1,10 @@
+from decimal import Decimal
+
+from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
-from .models import Crust, Customer, Order, Payment, Pizza, Topping
+from .data import BASE_PIZZA_PRICE, DELIVERY_PRICE
+from .models import Crust, Customer, Order, Payment, Pizza, Size, Topping
 
 
 class CrustSerializer(serializers.ModelSerializer):
@@ -22,6 +26,24 @@ class CustomerSerializer(serializers.ModelSerializer):
         ]
 
 
+class SizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = [
+            "external_id",
+            "name",
+            "price_modifier",
+            "date_created",
+            "date_updated",
+        ]
+
+
+class CustomerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ["name", "email", "phone"]
+
+
 class ToppingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topping
@@ -30,55 +52,55 @@ class ToppingSerializer(serializers.ModelSerializer):
 
 class PizzaSerializer(serializers.ModelSerializer):
     toppings = ToppingSerializer(many=True, read_only=True)
+    size = SizeSerializer(read_only=True)
+    crust = CrustSerializer(read_only=True)
 
     class Meta:
         model = Pizza
         fields = [
             "external_id",
+            "size",
             "toppings",
+            "crust",
             "price",
             "date_created",
             "date_updated",
         ]
 
 
-class ToppingCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Topping
-        fields = ["external_id"]
-
-
 class PizzaCreateSerializer(serializers.ModelSerializer):
-    toppings = ToppingCreateSerializer(many=True)
-    crust = serializers.PrimaryKeyRelatedField(queryset=Crust.objects.all())
+    toppings = serializers.SlugRelatedField(
+        queryset=Topping.objects.all(), slug_field="external_id", many=True
+    )
+    crust = serializers.SlugRelatedField(
+        queryset=Crust.objects.all(), slug_field="external_id"
+    )
+    size = serializers.SlugRelatedField(
+        queryset=Size.objects.all(), slug_field="external_id"
+    )
 
     class Meta:
         model = Pizza
-        fields = ["name", "size", "toppings", "crust", "price"]
+        fields = ["size", "toppings", "crust", "price"]
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
-    customer = serializers.PrimaryKeyRelatedField(
-        queryset=Customer.objects.all(), required=False
-    )
-    customer_name = serializers.CharField(max_length=100, required=False)
-    customer_email = serializers.EmailField(required=False)
-    customer_phone = serializers.CharField(max_length=20, required=False)
+    customer_external_id = serializers.CharField(max_length=100, required=False)
+    customer = CustomerCreateSerializer(required=False)
     pizzas = PizzaCreateSerializer(many=True)
     total_price = serializers.DecimalField(
         max_digits=8, decimal_places=2, required=False
     )
-    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, default="Pending")
+    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, default="pending")
     notes = serializers.CharField(required=False, allow_blank=True)
     method = serializers.ChoiceField(choices=Order.METHOD_CHOICES, default="pickup")
 
     class Meta:
         model = Order
         fields = [
+            "external_id",
+            "customer_external_id",
             "customer",
-            "customer_name",
-            "customer_email",
-            "customer_phone",
             "pizzas",
             "total_price",
             "status",
@@ -87,44 +109,71 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        if "customer" not in data and (
-            "customer_name" not in data or "customer_email" not in data
-        ):
+        if "customer_external_id" not in data and "customer" not in data:
             raise serializers.ValidationError(
-                "Either customer ID or customer details (name and email) must be provided."
+                "Either customer_external_id or customer details must be provided."
+            )
+        if "total_price" not in data:
+            raise serializers.ValidationError("Total price is required.")
+
+        total_price = 0
+        if data["method"] == "delivery":
+            total_price += DELIVERY_PRICE
+        for pizza_data in data["pizzas"]:
+            pizza_price = BASE_PIZZA_PRICE
+            for topping in pizza_data["toppings"]:
+                pizza_price += topping.price
+            pizza_price += pizza_data["crust"].price
+            pizza_price *= pizza_data["size"].price_modifier
+            total_price += Decimal(pizza_price).quantize(Decimal("1.00"))
+
+        if total_price != data["total_price"]:
+            print(
+                f"Total price: {total_price}, data total price: {data['total_price']}"
+            )
+            raise serializers.ValidationError(
+                "Total price does not match the sum of pizza prices."
             )
         return data
 
     def create(self, validated_data):
-        customer_data = validated_data.pop("customer", None)
-        customer_name = validated_data.pop("customer_name", None)
-        customer_email = validated_data.pop("customer_email", None)
-        customer_phone = validated_data.pop("customer_phone", None)
-        pizzas_data = validated_data.pop("pizzas")
+        with transaction.atomic() as tx:
+            customer_external_id = validated_data.pop("customer_external_id", None)
+            customer_data = validated_data.pop("customer", None)
+            pizzas_data = validated_data.pop("pizzas")
 
-        if not customer_data:
-            customer_data, _ = Customer.objects.get_or_create(
-                email=customer_email,
-                defaults={"name": customer_name, "phone": customer_phone or ""},
-            )
+            if customer_external_id:
+                try:
+                    customer = Customer.objects.get(external_id=customer_external_id)
+                except Customer.DoesNotExist:
+                    raise serializers.ValidationError("Customer not found.")
+            elif customer_data:
+                customer, _ = Customer.objects.get_or_create(
+                    email=customer_data["email"],
+                    defaults={
+                        "name": customer_data["name"],
+                        "phone": customer_data["phone"],
+                    },
+                )
+            else:
+                raise serializers.ValidationError("Customer information is required.")
 
-        order = Order.objects.create(customer=customer_data, **validated_data)
+            try:
+                order = Order.objects.create(customer=customer, **validated_data)
+            except IntegrityError as e:
+                raise serializers.ValidationError("Integrity error")
 
-        total_price = 0
-        for pizza_data in pizzas_data:
-            toppings_data = pizza_data.pop("toppings")
-            pizza = Pizza.objects.create(**pizza_data)
-            for topping_data in toppings_data:
-                topping, _ = Topping.objects.get_or_create(**topping_data)
-                pizza.toppings.add(topping)
-            order.pizzas.add(pizza)
-            total_price += pizza.price
+            for pizza_data in pizzas_data:
+                toppings_data = pizza_data.pop("toppings")
+                pizza = Pizza.objects.create(**pizza_data)
+                for topping in toppings_data:
+                    # topping = Topping.objects.get(external_id=topping_external_id)
+                    pizza.toppings.add(topping)
+                order.pizzas.add(pizza)
 
-        if not order.total_price:
-            order.total_price = total_price
             order.save()
 
-        return order
+            return order
 
 
 class OrderSerializer(serializers.ModelSerializer):

@@ -1,19 +1,31 @@
 import { cn } from '@/lib/utils';
 import { ComponentProps, FC } from 'react';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
-import { Pizza } from '@/lib/schemas';
+import { CrustType, PizzaSizeName } from '@/lib/schemas';
 import { Button } from './ui/button';
 import { useOrder } from '@/lib/use-order';
+import { useCrusts, useSizes, useToppings } from '@/lib/api';
+import { Skeleton } from './ui/skeleton';
 
-const menu: (Pizza & { name: string })[] = [
+type MenuPizza = {
+  name: string;
+  image: string;
+  size: PizzaSizeName;
+  crust: CrustType;
+  toppings: string[];
+};
+
+const menu: MenuPizza[] = [
   {
     name: 'Pepperoni Feast',
+    image: '/pepperoni.webp',
     size: 'Large',
     crust: 'Thin',
     toppings: ['Pepperoni', 'Extra cheese'],
   },
   {
     name: 'Veggie Delight',
+    image: '/veggie.webp',
     size: 'Medium',
     crust: 'Regular',
     toppings: [
@@ -26,18 +38,21 @@ const menu: (Pizza & { name: string })[] = [
   },
   {
     name: 'Meat Lovers',
+    image: '/meat.webp',
     size: 'Extra Large',
     crust: 'Thick',
     toppings: ['Pepperoni', 'Sausage', 'Bacon'],
   },
   {
     name: 'Hawaiian Classic',
+    image: '/hawaiian.webp',
     size: 'Small',
     crust: 'Stuffed',
     toppings: ['Pineapple', 'Bacon'],
   },
   {
     name: 'Supreme',
+    image: '/supreme.webp',
     size: 'Large',
     crust: 'Regular',
     toppings: [
@@ -51,6 +66,7 @@ const menu: (Pizza & { name: string })[] = [
   },
   {
     name: 'Spinach & Cheese',
+    image: '/spinach.webp',
     size: 'Medium',
     crust: 'Thin',
     toppings: ['Spinach', 'Extra cheese', 'Mushrooms'],
@@ -78,17 +94,24 @@ export const PizzaMenu: FC<ComponentProps<'div'>> = ({
   );
 };
 
-type PizzaMenuCardProps = ComponentProps<'div'> & {
-  pizza: Pizza & { name: string };
-};
+type PizzaMenuCardProps = ComponentProps<'div'> & { pizza: MenuPizza };
 const PizzaMenuCard: FC<PizzaMenuCardProps> = ({
   pizza,
   className,
   ...props
 }) => {
+  const { data: sizes, isLoading: sizesLoading } = useSizes();
+  const { data: crusts, isLoading: crustsLoading } = useCrusts();
+  const { data: toppings, isLoading: toppingsLoading } = useToppings();
   const { setPizza } = useOrder();
   const onClick = () => {
-    setPizza(pizza);
+    setPizza({
+      size: sizes!.find((s) => s.name === pizza.size)!,
+      crust: crusts!.find((c) => c.name === pizza.crust)!,
+      toppings: pizza.toppings.map(
+        (name) => toppings!.find((t) => t.name === name)!,
+      ),
+    });
   };
   return (
     <div
@@ -98,16 +121,25 @@ const PizzaMenuCard: FC<PizzaMenuCardProps> = ({
       )}
       {...props}
     >
-      <div className="bg-primary w-full h-full" />
-      <div className="flex flex-col w-full gap-2">
-        <h3 className="text-xl text-primary font-bold">{pizza.name}</h3>
-        <div className="flex gap-2 items-end">
-          <div className="text-sm text-muted-foreground text-pretty">
-            {pizza.toppings.join(', ')}
+      {sizesLoading || crustsLoading || toppingsLoading ? (
+        <Skeleton />
+      ) : (
+        <>
+          <div
+            style={{ backgroundImage: `url(${pizza.image})` }}
+            className="bg-cover w-full h-full"
+          />
+          <div className="flex flex-col w-full gap-2">
+            <h3 className="text-xl text-primary font-bold">{pizza.name}</h3>
+            <div className="flex gap-2 items-end">
+              <div className="text-sm text-muted-foreground text-pretty">
+                {pizza.toppings.join(', ')}
+              </div>
+              <Button onClick={onClick}>Order now</Button>
+            </div>
           </div>
-          <Button onClick={onClick}>Order now</Button>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

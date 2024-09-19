@@ -1,0 +1,112 @@
+[
+  {
+    "model": "pizza_shop.topping",
+    "pk": 1,
+    "fields": {
+      "external_id": "top-01J7RXG77N06KVFJWN6AJYJ850",
+      "name": "Pepperoni",
+      "price": "1.50",
+      "date_created": "2024-09-14T18:42:37.941Z",
+      "date_updated": "2024-09-14T18:42:37.941Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 2,
+    "fields": {
+      "external_id": "top-01J7RXG77P878N9VASPKXY985Z",
+      "name": "Mushrooms",
+      "price": "1.00",
+      "date_created": "2024-09-14T18:42:37.942Z",
+      "date_updated": "2024-09-14T18:42:37.942Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 3,
+    "fields": {
+      "external_id": "top-01J7RXG77QV34XAM91A9V3WDQK",
+      "name": "Onions",
+      "price": "0.75",
+      "date_created": "2024-09-14T18:42:37.943Z",
+      "date_updated": "2024-09-14T18:42:37.943Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 4,
+    "fields": {
+      "external_id": "top-01J7RXG77QWQN9E5YZQ40RE1BQ",
+      "name": "Sausage",
+      "price": "1.50",
+      "date_created": "2024-09-14T18:42:37.943Z",
+      "date_updated": "2024-09-14T18:42:37.943Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 5,
+    "fields": {
+      "external_id": "top-01J7RXG77RVPQYHK1WMG1A3BZM",
+      "name": "Bacon",
+      "price": "1.75",
+      "date_created": "2024-09-14T18:42:37.944Z",
+      "date_updated": "2024-09-14T18:42:37.944Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 6,
+    "fields": {
+      "external_id": "top-01J7RXG77SAFAXWM8CPTBXG975",
+      "name": "Extra cheese",
+      "price": "1.25",
+      "date_created": "2024-09-14T18:42:37.945Z",
+      "date_updated": "2024-09-14T18:42:37.945Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 7,
+    "fields": {
+      "external_id": "top-01J7RXG77T57K4NGV0BY3TDG1V",
+      "name": "Black olives",
+      "price": "1.00",
+      "date_created": "2024-09-14T18:42:37.946Z",
+      "date_updated": "2024-09-14T18:42:37.946Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 8,
+    "fields": {
+      "external_id": "top-01J7RXG77T4BHTTWSGKZXZJ38M",
+      "name": "Green peppers",
+      "price": "0.75",
+      "date_created": "2024-09-14T18:42:37.946Z",
+      "date_updated": "2024-09-14T18:42:37.946Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 9,
+    "fields": {
+      "external_id": "top-01J7RXG77V79H947GHHW4B93QS",
+      "name": "Pineapple",
+      "price": "1.00",
+      "date_created": "2024-09-14T18:42:37.947Z",
+      "date_updated": "2024-09-14T18:42:37.947Z"
+    }
+  },
+  {
+    "model": "pizza_shop.topping",
+    "pk": 10,
+    "fields": {
+      "external_id": "top-01J7RXG77WAHSNK0MZR2917SDF",
+      "name": "Spinach",
+      "price": "1.00",
+      "date_created": "2024-09-14T18:42:37.948Z",
+      "date_updated": "2024-09-14T18:42:37.948Z"
+    }
+  }
+]

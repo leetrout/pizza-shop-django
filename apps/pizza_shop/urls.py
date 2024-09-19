@@ -1,3 +1,4 @@
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
@@ -6,6 +7,7 @@ from .views import (
     OrderViewSet,
     PaymentViewSet,
     PizzaViewSet,
+    SizeViewSet,
     ToppingViewSet,
 )
 
@@ -16,3 +18,4 @@ router.register(r"pizzas", PizzaViewSet)
 router.register(r"orders", OrderViewSet)
 router.register(r"payments", PaymentViewSet)
 router.register(r"crusts", CrustViewSet)
+router.register(r"sizes", SizeViewSet)

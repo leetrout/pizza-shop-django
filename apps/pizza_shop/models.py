@@ -61,13 +61,20 @@ class Crust(models.Model):
         return self.name
 
 
-class Pizza(models.Model):
-    SIZE_CHOICES = data.PIZZA_SIZE_CHOICES
+class Size(models.Model):
+    external_id = PrefixedULIDField(prefix="sz", db_index=True)
+    name = models.CharField(max_length=50, unique=True)
+    price_modifier = models.DecimalField(max_digits=4, decimal_places=2)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
+
+class Pizza(models.Model):
     external_id = PrefixedULIDField(prefix="piz", db_index=True)
-    size = models.CharField(
-        max_length=20, choices=data.PIZZA_SIZE_CHOICES, default="medium"
-    )
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
     toppings = models.ManyToManyField(Topping)
     crust = models.ForeignKey(Crust, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -75,7 +82,7 @@ class Pizza(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.size.capitalize()} {self.name}"
+        return f"{self.size.name} {self.crust.name} pizza"
 
 
 class Order(models.Model):
@@ -108,6 +115,10 @@ class Order(models.Model):
             raise ValidationError(
                 "'Ready for pickup' status can only be set for pickup orders."
             )
+        if self.status not in [status[0] for status in self.STATUS_CHOICES]:
+            raise ValidationError(f"Invalid status: {self.status}")
+        if not self.status:
+            self.status = "pending"
 
     def save(self, *args, **kwargs):
         self.clean()

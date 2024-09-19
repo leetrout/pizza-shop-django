@@ -1,0 +1,46 @@
+[
+  {
+    "model": "pizza_shop.crust",
+    "pk": 1,
+    "fields": {
+      "external_id": "cru-01J7RXG77XT40BN6C6RY8KMKY0",
+      "name": "Thin",
+      "price": "0.00",
+      "date_created": "2024-09-14T18:42:37.949Z",
+      "date_updated": "2024-09-14T18:42:37.949Z"
+    }
+  },
+  {
+    "model": "pizza_shop.crust",
+    "pk": 2,
+    "fields": {
+      "external_id": "cru-01J7RXG77Y8K1DA2R1DMF1J6J5",
+      "name": "Regular",
+      "price": "1.00",
+      "date_created": "2024-09-14T18:42:37.950Z",
+      "date_updated": "2024-09-14T18:42:37.950Z"
+    }
+  },
+  {
+    "model": "pizza_shop.crust",
+    "pk": 3,
+    "fields": {
+      "external_id": "cru-01J7RXG77YWN46DXBEZRE242MJ",
+      "name": "Thick",
+      "price": "2.00",
+      "date_created": "2024-09-14T18:42:37.950Z",
+      "date_updated": "2024-09-14T18:42:37.950Z"
+    }
+  },
+  {
+    "model": "pizza_shop.crust",
+    "pk": 4,
+    "fields": {
+      "external_id": "cru-01J7RXG77Z9WNE3AE9YMYA60KM",
+      "name": "Stuffed",
+      "price": "3.00",
+      "date_created": "2024-09-14T18:42:37.951Z",
+      "date_updated": "2024-09-14T18:42:37.951Z"
+    }
+  }
+]

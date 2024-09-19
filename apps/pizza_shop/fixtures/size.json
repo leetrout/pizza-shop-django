@@ -1,0 +1,46 @@
+[
+  {
+    "model": "pizza_shop.size",
+    "pk": 1,
+    "fields": {
+      "external_id": "sz-01J7RXG77H9JKZQZTDTG7YK04A",
+      "name": "Small",
+      "price_modifier": "0.80",
+      "date_created": "2024-09-14T18:42:37.937Z",
+      "date_updated": "2024-09-14T18:42:37.937Z"
+    }
+  },
+  {
+    "model": "pizza_shop.size",
+    "pk": 2,
+    "fields": {
+      "external_id": "sz-01J7RXG77J0YYKXTKQNVPDK0ZB",
+      "name": "Medium",
+      "price_modifier": "1.00",
+      "date_created": "2024-09-14T18:42:37.939Z",
+      "date_updated": "2024-09-14T18:42:37.939Z"
+    }
+  },
+  {
+    "model": "pizza_shop.size",
+    "pk": 3,
+    "fields": {
+      "external_id": "sz-01J7RXG77K8SG5ZN608MQKZ3WF",
+      "name": "Large",
+      "price_modifier": "1.20",
+      "date_created": "2024-09-14T18:42:37.939Z",
+      "date_updated": "2024-09-14T18:42:37.939Z"
+    }
+  },
+  {
+    "model": "pizza_shop.size",
+    "pk": 4,
+    "fields": {
+      "external_id": "sz-01J7RXG77MZWHQBAVNQ64C22VP",
+      "name": "Extra Large",
+      "price_modifier": "1.40",
+      "date_created": "2024-09-14T18:42:37.940Z",
+      "date_updated": "2024-09-14T18:42:37.940Z"
+    }
+  }
+]

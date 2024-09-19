@@ -4,8 +4,10 @@ import { OrderProvider } from './lib/order-provider';
 import { PizzaMenu } from './components/pizza-menu';
 import { CreatePizzaButton } from './components/create-pizza-button';
 import { PizzaWizard } from './components/pizza-wizard';
-import { OrderSummary } from './components/order-summary';
+import { OrderSummaryCard } from './components/order-summary';
 import { MethodSwitch } from './components/method-switch';
+import { CustomerInfoCard } from './components/customer-info-card';
+import { OrderStatusDialog } from './components/order-status-dialog';
 
 function App() {
   return (
@@ -19,7 +21,8 @@ function App() {
         </div>
       </header>
       <OrderProvider>
-        <main className="container mx-auto px-8 py-8 flex flex-col gap-8">
+        <OrderStatusDialog />
+        <main className="container antialiased mx-auto px-8 py-8 flex flex-col gap-8">
           <section className="border-l px-4 py-2 flex items-center justify-between">
             <div>
               <h1 className="text-4xl">Welcome to Antonio's!</h1>
@@ -34,7 +37,10 @@ function App() {
             <CreatePizzaButton className="w-full" />
           </section>
           <PizzaWizard />
-          <OrderSummary />
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <OrderSummaryCard />
+            <CustomerInfoCard />
+          </section>
         </main>
       </OrderProvider>
     </QueryProvider>

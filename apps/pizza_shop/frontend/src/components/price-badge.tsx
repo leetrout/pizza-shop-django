@@ -8,10 +8,11 @@ type PriceBadgeProps = {
 };
 
 export const PriceBadge: FC<PriceBadgeProps> = ({ pizza }) => {
-  const { getPizzaPrice } = usePizzaPrice();
+  const { data: price } = usePizzaPrice(pizza);
+  if (!price) return null;
   return (
     <Badge className="hover:bg-primary absolute text-sm right-0 bottom-0 -translate-x-2 translate-y-3 rounded-full">
-      ${getPizzaPrice(pizza).toFixed(2)}
+      ${price.toFixed(2)}
     </Badge>
   );
 };

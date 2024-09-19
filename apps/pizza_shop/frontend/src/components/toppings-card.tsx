@@ -47,12 +47,14 @@ export const ToppingsCard: FC<ComponentProps<'div'>> = (props) => {
           <ToggleGroup
             disabled={isLoading}
             type="multiple"
-            value={curPizza?.toppings}
+            value={curPizza?.toppings.map((t) => t.name)}
             onValueChange={(value) => {
               const newToppings = value;
               setPizza((oldPizza) => ({
                 ...oldPizza!,
-                toppings: newToppings,
+                toppings: newToppings.map(
+                  (name) => toppings!.find((t) => t.name === name)!,
+                ),
               }));
             }}
             className="w-full max-h-64 flex flex-col flex-wrap items-start gap-2"

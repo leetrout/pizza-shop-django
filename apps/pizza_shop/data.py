@@ -1,11 +1,4 @@
-PIZZA_SIZE_CHOICES = [
-    ("small", "Small"),
-    ("medium", "Medium"),
-    ("large", "Large"),
-    ("extra_large", "Extra Large"),
-]
-
-PIZZA_SIZES = [x[0] for x in PIZZA_SIZE_CHOICES]
+from decimal import Decimal
 
 DELIVERY_METHOD_CHOICES = [
     ("pickup", "Pickup"),
@@ -13,6 +6,8 @@ DELIVERY_METHOD_CHOICES = [
 ]
 
 DELIVERY_METHODS = [x[0] for x in DELIVERY_METHOD_CHOICES]
+
+DELIVERY_METHOD_MAP = {x: x for x in DELIVERY_METHODS}
 
 ORDER_STATUS_CHOICES = [
     ("pending", "Pending"),
@@ -24,6 +19,10 @@ ORDER_STATUS_CHOICES = [
 ]
 
 ORDER_STATUSES = [x[0] for x in ORDER_STATUS_CHOICES]
+ORDER_STATUS_MAP = {x: x for x in ORDER_STATUSES}
+
+BASE_PIZZA_PRICE = Decimal("5.00")
+DELIVERY_PRICE = Decimal("5.00")
 
 ORDER_TRANSITIONS_DELIVERY = {
     "pending": "making",

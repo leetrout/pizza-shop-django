@@ -9,9 +9,11 @@ import {
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 import { CookieIcon } from '@radix-ui/react-icons';
 import { useOrder } from '@/lib/use-order';
-import { CrustType } from '@/lib/schemas';
+import { useCrusts } from '@/lib/api';
+import { Skeleton } from './ui/skeleton';
 
 export const CrustCard: FC<ComponentProps<'div'>> = (props) => {
+  const { data: crusts, isLoading } = useCrusts();
   const { curPizza, setPizza } = useOrder();
   if (!curPizza) return null;
   return (
@@ -24,30 +26,31 @@ export const CrustCard: FC<ComponentProps<'div'>> = (props) => {
         <div className="w-full flex items-center justify-center">
           <CookieIcon className="w-16 h-16 text-primary" />
         </div>
-        <ToggleGroup
-          type="single"
-          value={curPizza.crust}
-          onValueChange={(value) =>
-            setPizza((oldPizza) => ({
-              ...oldPizza!,
-              crust: value as CrustType,
-            }))
-          }
-          className="w-full flex flex-col items-start gap-2"
-        >
-          <ToggleGroupItem className="text-xl" value="Regular">
-            Regular
-          </ToggleGroupItem>
-          <ToggleGroupItem className="text-xl" value="Thin">
-            Thin
-          </ToggleGroupItem>
-          <ToggleGroupItem className="text-xl" value="Thick">
-            Thick
-          </ToggleGroupItem>
-          <ToggleGroupItem className="text-xl" value="Stuffed">
-            Stuffed
-          </ToggleGroupItem>
-        </ToggleGroup>
+        {isLoading ? (
+          <Skeleton />
+        ) : (
+          <ToggleGroup
+            type="single"
+            value={curPizza.crust.name}
+            onValueChange={(value) =>
+              setPizza((oldPizza) => ({
+                ...oldPizza!,
+                crust: crusts!.find((c) => c.name === value)!,
+              }))
+            }
+            className="w-full flex flex-col items-start gap-2"
+          >
+            {crusts!.map((c) => (
+              <ToggleGroupItem
+                key={c.external_id}
+                className="text-xl"
+                value={c.name}
+              >
+                {c.name}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        )}
       </CardContent>
     </Card>
   );

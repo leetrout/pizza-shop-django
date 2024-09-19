@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from faker import Faker
 
-from apps.pizza_shop.models import Crust, Customer, Order, Pizza, Topping
+from apps.pizza_shop.models import Crust, Customer, Order, Pizza, Size, Topping
 
 fake = Faker()
 
@@ -29,6 +29,13 @@ CRUSTS = [
     {"name": "Stuffed", "price": Decimal("3.00")},
 ]
 
+SIZES = [
+    {"name": "Small", "price_modifier": Decimal("0.8")},
+    {"name": "Medium", "price_modifier": Decimal("1")},
+    {"name": "Large", "price_modifier": Decimal("1.2")},
+    {"name": "Extra Large", "price_modifier": Decimal("1.4")},
+]
+
 
 class Command(BaseCommand):
     help = "Creates sample data for the pizza shop"
@@ -42,6 +49,7 @@ class Command(BaseCommand):
         num_orders = options["orders"]
 
         with transaction.atomic():
+            self.create_sizes()
             self.create_toppings_and_crusts()
             customers = self.create_customers(num_customers)
             self.create_orders(num_orders, customers)
@@ -51,6 +59,12 @@ class Command(BaseCommand):
                 f"Successfully created {num_customers} customers and {num_orders} orders"
             )
         )
+
+    def create_sizes(self):
+        for size in SIZES:
+            Size.objects.get_or_create(
+                name=size["name"], price_modifier=size["price_modifier"]
+            )
 
     def create_toppings_and_crusts(self):
         for topping in TOPPINGS:
@@ -70,7 +84,7 @@ class Command(BaseCommand):
     def create_orders(self, num_orders, customers):
         toppings = list(Topping.objects.all())
         crusts = list(Crust.objects.all())
-
+        sizes = list(Size.objects.all())
         for _ in range(num_orders):
             customer = random.choice(customers)
             method = random.choice([method[0] for method in Order.METHOD_CHOICES])
@@ -105,7 +119,7 @@ class Command(BaseCommand):
 
             for _ in range(num_pizzas):
                 pizza = Pizza.objects.create(
-                    size=random.choice([size[0] for size in Pizza.SIZE_CHOICES]),
+                    size=random.choice(sizes),
                     crust=random.choice(crusts),
                     price=Decimal("0"),  # We'll calculate this after adding toppings
                 )
@@ -117,12 +131,7 @@ class Command(BaseCommand):
                 # Calculate pizza price
                 base_price = Decimal("10")  # Base price for a pizza
                 topping_price = sum(topping.price for topping in pizza_toppings)
-                size_modifier = {
-                    "small": Decimal("0.8"),
-                    "medium": Decimal("1"),
-                    "large": Decimal("1.2"),
-                    "extra_large": Decimal("1.4"),
-                }[pizza.size]
+                size_modifier = pizza.size.price_modifier
                 pizza.price = (
                     base_price + topping_price + pizza.crust.price
                 ) * size_modifier
