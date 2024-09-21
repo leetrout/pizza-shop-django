@@ -1,0 +1,17 @@
+layout {
+  pane size=1 borderless=true {
+    plugin location="zellij:tab-bar"
+  }
+  pane {
+    command "./watch-server.sh"
+  }
+  pane {
+    command "./watch-sim.sh"
+  }
+  pane {
+    command "./watch-frontend.sh"
+  }
+  pane size=2 borderless=true {
+    plugin location="zellij:status-bar"
+  }
+}
