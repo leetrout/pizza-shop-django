@@ -2,7 +2,6 @@ import datetime
 import random
 import time
 
-import sentry_sdk
 from django.utils import timezone
 from django_rq import job
 
@@ -29,35 +28,26 @@ def get_order_transition_time(order, state_timing_map=None):
 
 def simulate_pizza_shop(orders=None, state_timing_map=None):
     """Moves orders through the system"""
-    with sentry_sdk.start_transaction(op="task", name="Simulate Pizza Shop") as stx:
-        print("stx", stx)
-        if state_timing_map is None:
-            state_timing_map = state_timing_seconds
+    if state_timing_map is None:
+        state_timing_map = state_timing_seconds
 
-        if orders is None:
-            orders = Order.objects.all()
+    if orders is None:
+        orders = Order.objects.all()
 
-        now = timezone.now()
+    now = timezone.now()
 
-        stx.set_tag("order_count", orders.count())
+    for order in orders:
+        transition_time = get_order_transition_time(order, state_timing_map)
 
-        for order in orders:
-            with sentry_sdk.start_span(description=f"Simulate Order") as span:
-                print("span", span)
-                transition_time = get_order_transition_time(order, state_timing_map)
+        if transition_time > now:
+            print(f"Order {order.id} will transition at {transition_time}")
+            continue
 
-                if transition_time > now:
-                    print(f"Order {order.id} will transition at {transition_time}")
-                    span.set_tag("wait", True)
-                    continue
+        old_status = order.status
+        order.status = ORDER_TRANSITIONS[order.method][order.status]
+        order.save()
 
-                span.set_tag("wait", False)
-                old_status = order.status
-                order.status = ORDER_TRANSITIONS[order.method][order.status]
-                order.save()
-                span.set_tag("transition", f"{old_status} -> {order.status}")
-
-                print(f"Order {order.id} transitioned to {order.status}")
+        print(f"Order {order.id} transitioned from {old_status} to {order.status}")
 
 
 @job
