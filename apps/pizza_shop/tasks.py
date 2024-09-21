@@ -3,7 +3,6 @@ import random
 import time
 
 from django.utils import timezone
-from django_rq import job
 
 from .data import ORDER_TRANSITIONS
 from .models import Order
@@ -48,17 +47,3 @@ def simulate_pizza_shop(orders=None, state_timing_map=None):
         order.save()
 
         print(f"Order {order.id} transitioned from {old_status} to {order.status}")
-
-
-@job
-def process_pending_order(order_id):
-    print("Processing pending orders")
-    time.sleep(random.randint(10, 45))
-    order = Order.objects.get(id=order_id)
-    if order and order.status == "pending":
-        order.status = "making"
-        order.save()
-        print(f"Order {order.id} processed")
-    else:
-        print("No pending orders to process")
-    print("Finished processing pending orders")

@@ -8,19 +8,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from pathlib import Path
 
-from ._env import BASE_DIR, env
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str("SECRET_KEY")
+SECRET_KEY = "topsecret"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = True
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS = ["*"]
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
 
 
 # Application definition
@@ -73,28 +77,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# FIXME: Write config scenario
-# TODO: Use for config example
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "pizza_shop",
-#         "USER": "pizza_user",
-#         "PASSWORD": "pizza_password",
-#         "HOST": "localhost",
-#         "PORT": "15432",
-#     }
-# }
-
 DATABASES = {
-    "default": env.db(),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
 }
 
 
@@ -140,62 +127,3 @@ STATIC_ROOT = BASE_DIR / "static"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "filters": {
-        "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse",
-        },
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        },
-    },
-    "formatters": {
-        "django.server": {
-            "()": "django.utils.log.ServerFormatter",
-            "format": "[{server_time}] {message}",
-            "style": "{",
-        }
-    },
-    "handlers": {
-        "console": {
-            "level": "INFO",
-            "filters": ["require_debug_true"],
-            "class": "logging.StreamHandler",
-        },
-        "django.server": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "django.server",
-        },
-        "mail_admins": {
-            "level": "ERROR",
-            "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler",
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],  # , "mail_admins"],
-            "level": "INFO",
-        },
-        "django.server": {
-            "handlers": ["django.server"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
-
-RQ_QUEUES = {
-    "default": {
-        "HOST": "localhost",
-        "PORT": 16379,
-        "DB": 0,
-    },
-}
-
-if env.bool("SENTRY_ENABLED", False):
-    from .sentry import *

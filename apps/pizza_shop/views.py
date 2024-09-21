@@ -15,7 +15,6 @@ from .serializers import (
     SizeSerializer,
     ToppingSerializer,
 )
-from .tasks import process_pending_order
 
 
 class ExternalIdCursorPagination(CursorPagination):
