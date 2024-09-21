@@ -199,3 +199,5 @@ RQ_QUEUES = {
 
 if env.bool("SENTRY_ENABLED", False):
     from .sentry import *
+else:
+    raise ValueError("Sentry is not enabled")
