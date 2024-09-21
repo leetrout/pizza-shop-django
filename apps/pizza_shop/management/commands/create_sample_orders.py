@@ -2,39 +2,12 @@ import random
 from decimal import Decimal
 
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import IntegrityError
 from faker import Faker
 
 from apps.pizza_shop.models import Crust, Customer, Order, Pizza, Size, Topping
 
 fake = Faker()
-
-TOPPINGS = [
-    {"name": "Pepperoni", "price": Decimal("1.50")},
-    {"name": "Mushrooms", "price": Decimal("1.00")},
-    {"name": "Onions", "price": Decimal("0.75")},
-    {"name": "Sausage", "price": Decimal("1.50")},
-    {"name": "Bacon", "price": Decimal("1.75")},
-    {"name": "Extra cheese", "price": Decimal("1.25")},
-    {"name": "Black olives", "price": Decimal("1.00")},
-    {"name": "Green peppers", "price": Decimal("0.75")},
-    {"name": "Pineapple", "price": Decimal("1.00")},
-    {"name": "Spinach", "price": Decimal("1.00")},
-]
-
-CRUSTS = [
-    {"name": "Thin", "price": Decimal("0.00")},
-    {"name": "Regular", "price": Decimal("1.00")},
-    {"name": "Thick", "price": Decimal("2.00")},
-    {"name": "Stuffed", "price": Decimal("3.00")},
-]
-
-SIZES = [
-    {"name": "Small", "price_modifier": Decimal("0.8")},
-    {"name": "Medium", "price_modifier": Decimal("1")},
-    {"name": "Large", "price_modifier": Decimal("1.2")},
-    {"name": "Extra Large", "price_modifier": Decimal("1.4")},
-]
 
 
 class Command(BaseCommand):
@@ -48,11 +21,11 @@ class Command(BaseCommand):
         num_customers = options["customers"]
         num_orders = options["orders"]
 
-        with transaction.atomic():
-            self.create_sizes()
-            self.create_toppings_and_crusts()
-            customers = self.create_customers(num_customers)
-            self.create_orders(num_orders, customers)
+        self.create_customers(num_customers)
+
+        customer_choices = list(Customer.objects.all())
+
+        self.create_orders(num_orders, customer_choices)
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -60,24 +33,19 @@ class Command(BaseCommand):
             )
         )
 
-    def create_sizes(self):
-        for size in SIZES:
-            Size.objects.get_or_create(
-                name=size["name"], price_modifier=size["price_modifier"]
-            )
-
-    def create_toppings_and_crusts(self):
-        for topping in TOPPINGS:
-            Topping.objects.get_or_create(name=topping["name"], price=topping["price"])
-        for crust in CRUSTS:
-            Crust.objects.get_or_create(name=crust["name"], price=crust["price"])
-
     def create_customers(self, num_customers):
         customers = []
         for _ in range(num_customers):
-            customer = Customer.objects.create(
-                name=fake.name(), email=fake.email(), phone=fake.phone_number()
-            )
+            try:
+                customer = Customer.objects.create(
+                    name=fake.name(), email=fake.email(), phone=fake.phone_number()
+                )
+            except IntegrityError:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Customer {fake.name()} already exists, skipping..."
+                    )
+                )
             customers.append(customer)
         return customers
 
